@@ -187,16 +187,41 @@ function saveFeedbackLocally(payload) {
 }
 
 async function sendFeedback(payload) {
-  if (!FEEDBACK_ENDPOINT) {
-    const saved = saveFeedbackLocally(payload);
+  const body = new URLSearchParams({
+    'form-name': 'guestbook',
+    dateTime: payload.createdAt,
+    rating: String(payload.rating),
+    door: String(payload.door || 0),
+    comment: String(payload.comment || '')
+  });
+
+  try {
+    const response = await fetch('/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: body.toString()
+    });
+
+    if (!response.ok) {
+      throw new Error('Submission failed');
+    }
+
     return {
-      ok: saved,
-      mode: 'local',
-      message: SITE_LANG === 'ar'
-        ? 'تم حفظ التقييم محليًا في المتصفح لأنه لا توجد خدمة خلفية مهيأة.'
-        : 'The rating was saved locally because no backend endpoint is configured.'
+      ok: true,
+      message: 'شكرا لك، تم إرسال تقييمك بنجاح.'
+    };
+
+  } catch (error) {
+    saveFeedbackLocally(payload);
+
+    return {
+      ok: false,
+      message: 'تعذر إرسال التقييم. يرجى المحاولة مرة أخرى.'
     };
   }
+}
 
   const body = new URLSearchParams({
     rating: String(payload.rating),
@@ -438,10 +463,37 @@ window.addEventListener('DOMContentLoaded',updateRemaining);
   document.addEventListener('copy',e=>{if(isEditable(e.target))return;e.preventDefault();e.stopImmediatePropagation();showNotice('copy');},true);
   document.addEventListener('cut',e=>{if(isEditable(e.target))return;e.preventDefault();e.stopImmediatePropagation();showNotice('copy');},true);
   document.addEventListener('click',e=>{
-    const target=e.target&&(e.target.nodeType===1?e.target:e.target.parentElement);
-    if(target&&target.closest('#copyMessageBtn')){e.preventDefault();e.stopImmediatePropagation();showNotice('copy');return;}
-    if(target&&target.closest('#startBtn')){e.preventDefault();e.stopImmediatePropagation();goToGame();return;}
-    if(target&&target.closest('#exitBtn, #backExit')){e.preventDefault();e.stopImmediatePropagation();goToHome();return;}
+    const if $('copyMessageBtn').addEventListener('click', async () => {
+  const text = $('messageText').textContent +
+    '\n\nhttps://reem-happy-day.netlify.app/';
+
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      temp.style.position = 'fixed';
+      temp.style.opacity = '0';
+      document.body.appendChild(temp);
+      temp.focus();
+      temp.select();
+
+      const copied = document.execCommand('copy');
+      temp.remove();
+
+      if (!copied) throw new Error('Copy failed');
+    }
+
+    $('shareStatus').textContent =
+      'تم نسخ الرسالة ورابط قصر الرسائل.';
+
+  } catch (error) {
+    $('shareStatus').textContent =
+      'تعذر النسخ تلقائيا. يرجى المحاولة مرة أخرى.';
+  }
+});
+}
   },true);
   document.addEventListener('keydown',e=>{
     if(isEditable(e.target))return;
