@@ -99,7 +99,7 @@ button,textarea{font:inherit}button{cursor:pointer}
     </div>
   </section>
   <section id="lockedBox" class="message-wrap" hidden>
-    <h2>🌿 اكتملت الزيارات المسموحة</h2>
+    <h2> اكتملت الزيارات المسموحة</h2>
     <p class="message-text">لكل باب 365 رسالة مختلفة. عودي إلى القائمة الرئيسية لمواصلة الاستكشاف.<br>شكرا لأنك جعلت قصر الرسائل يستمر في الهدوء.</p>
     <div class="message-actions"><button id="backExit" class="action-btn">العودة إلى القائمة الرئيسية</button></div>
   </section>
@@ -288,7 +288,7 @@ $('submitComment').addEventListener('click',async()=>{
     language: SITE_LANG
   };
 
-  $('commentStatus').textContent = SITE_LANG === 'ar' ? 'جارٍ إرسال التقييم...' : 'Submitting your rating...';
+  $('commentStatus').textContent = SITE_LANG === 'ar' ? 'جاري إرسال التقييم...' : 'Submitting your rating...';
 
   const result = await sendFeedback(payload);
   $('commentStatus').textContent = result.message;
@@ -309,7 +309,7 @@ function leave(){ $('game').classList.remove('active'); $('welcome').style.displ
 async function shareText(text){const payload={title:SITE_LANG==='ar'?'قصر الرسائل':'Palace of Messages',text:text+(SITE_LANG==='ar'?"\n\nمن قصر الرسائل — مساحة للتأمل وأبواب للأمل\nhttps://reem-happy-day.netlify.app/":"\n\nFrom the Palace of Messages — a space for reflection and hope\nhttps://reem-happy-day.netlify.app/")}; try{if(navigator.share){await navigator.share(payload);return SITE_LANG==='ar'?'تم فتح قائمة المشاركة.':'Share menu opened.';} return SITE_LANG==='ar'?'يمكنك نسخ الرسالة يدويا ومشاركتها.':'You can share the message manually.';}catch(e){return SITE_LANG==='ar'?'تم إلغاء المشاركة.':'Sharing was cancelled.';}}
 $('shareMessageBtn').addEventListener('click',async()=>{$('shareStatus').textContent=await shareText($('messageText').textContent);});
 $('copyMessageBtn').addEventListener('click',async()=>{const text=$('messageText').textContent+'\n\nhttps://reem-happy-day.netlify.app/';try{await navigator.clipboard.writeText(text);$('shareStatus').textContent=SITE_LANG==='ar'?'تم نسخ الرسالة ورابط قصر الرسائل.':'The message and Palace link were copied.';}catch(e){$('shareStatus').textContent=SITE_LANG==='ar'?'يمكنك نسخ الرسالة يدويا ومشاركتها.':'You can share the message manually.';}});
-document.querySelectorAll('[data-social]').forEach(btn=>btn.addEventListener('click',async()=>{const result=await shareText(SITE_LANG==='ar'?'زوري قصر الرسائل وافتحي بابا جديدا.':'Visit the Palace of Messages and open a new door.');$('shareStatus').textContent=result;}));
+document.querySelectorAll('[data-social]').forEach(btn=>btn.addEventListener('click',async()=>{const result=await shareText(SITE_LANG==='ar'?'زور قصر الرسائل وافتح بابا جديدا.':'Visit the Palace of Messages and open a new door.');$('shareStatus').textContent=result;}));
 
 $('backExit').addEventListener('click',leave);
 window.addEventListener('DOMContentLoaded',updateRemaining);
@@ -324,7 +324,7 @@ window.addEventListener('DOMContentLoaded',updateRemaining);
       .replace(/[0@]/g,'ا').replace(/[1!|]/g,'ي').replace(/[3]/g,'ع').replace(/[5]/g,'خ').replace(/[7]/g,'ح').replace(/[8]/g,'ه')
       .replace(/[\s\u200b-\u200f.,،؛;:!؟?*~_+=()\[\]{}<>/\\|\-]+/g,'');
   }
-  const banned=['كس','كسمك','كسخت','طيز','زب','زبي','شرموط','شرموطة','متناك','منيوك','منيك','عرص','قحبة','قواد','ديوث','خرا','يلعن','سافل','نجس','عاهر','مخنث','قذر','مقرف','خسيس','مهين','بذئ','هتك','جحش','كحبة'];
+  const banned=['كس','كسمك','كسخت','طيز','زب','زبي','شرموط','شرموطة','متناك','منيوك','منيك','عرص','قحبة','قواد','ديوث','خرا','يلعن','سافل','نجس','عاهر','مخنث','قذر','مقرف','خسيس','مهين','غير جميل','مش حلو','بذئ','هتك','جحش','كحبة'];
   function hasBannedWord(value){
     const raw=String(value||'').trim(), normalized=normalizeArabic(raw); if(!normalized)return false;
     return banned.some(word=>{
