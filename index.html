@@ -186,6 +186,41 @@ function saveFeedbackLocally(payload) {
   }
 }
 async function sendFeedback(payload) {
+  try {
+    const response = await fetch('/api/ratings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.error || 'Rating submission failed');
+    }
+
+    return {
+      ok: true,
+      message: SITE_LANG === 'ar'
+        ? 'شكرا لك، تم إرسال تقييمك بنجاح.'
+        : 'Thank you, your rating was sent successfully.'
+    };
+
+  } catch (error) {
+    console.error('Reem rating submission failed:', error);
+
+    saveFeedbackLocally(payload);
+
+    return {
+      ok: false,
+      message: SITE_LANG === 'ar'
+        ? 'تعذر إرسال التقييم إلى الموقع. حُفظت نسخة في هذا المتصفح فقط.'
+        : 'The rating could not be sent. A copy was saved in this browser only.'
+    };
+  }
+}
 
 
 $('submitComment').addEventListener('click',async()=>{
