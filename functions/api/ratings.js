@@ -1,0 +1,1 @@
+functions/api/ratings.js
