@@ -185,47 +185,7 @@ function saveFeedbackLocally(payload) {
     return false;
   }
 }
-
 async function sendFeedback(payload) {
-  try {
-    // Submit using the exact static form Netlify detects during deployment.
-    const form = document.querySelector('form[name="guestbook"][data-netlify="true"]');
-    if (!form) {
-      throw new Error('Netlify guestbook form is missing from this page.');
-    }
-
-    form.querySelector('[name="dateTime"]').value = payload.createdAt;
-    form.querySelector('[name="rating"]').value = String(payload.rating);
-    form.querySelector('[name="door"]').value = String(payload.door || 0);
-    form.querySelector('[name="comment"]').value = String(payload.comment || '');
-
-    const body = new URLSearchParams(new FormData(form));
-    const response = await fetch(form.getAttribute('action') || window.location.pathname, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      credentials: 'same-origin',
-      body: body.toString()
-    });
-
-    if (!response.ok) {
-      throw new Error('Netlify rejected the guestbook submission: HTTP ' + response.status);
-    }
-
-    return {
-      ok: true,
-      message: 'شكرا لك، تم إرسال تقييمك بنجاح.'
-    };
-  } catch (error) {
-    console.error('Reem guestbook submission failed:', error);
-    saveFeedbackLocally(payload);
-    return {
-      ok: false,
-      message: 'تعذر إرسال التقييم. يرجى المحاولة مرة أخرى.'
-    };
-  }
-}
 
 
 $('submitComment').addEventListener('click',async()=>{
@@ -338,7 +298,7 @@ window.addEventListener('DOMContentLoaded',updateRemaining);
   setText('#commentBtn',ar?'تقييم التجربة':'Rate this experience');
   setText('#exitBtn',ar?'العودة إلى القائمة الرئيسية':'Back to the main menu');
   setText('label[for="comment"]',ar?'ما رأيك في التجربة؟':'What did you think of the experience?');
-  setText('#commentBox > p',ar?'قيم مدى فائدة البرنامج من 1 إلى 5:':'Rate how helpful this experience was from 1 to 5:');
+  setText('#commentBox > p',ar?'قيم  البرنامج من 1 إلى 5:':'Rate how helpful this experience was from 1 to 5:');
   if($('comment'))$('comment').placeholder=ar?'اكتب تعليقك هنا...':'Write your comment here...';
   if($('commentCounter'))$('commentCounter').textContent=Array.from(($('comment')||{}).value||'').length+(ar?' / 50 حرفا':' / 50 characters');
   setText('#submitComment',ar?'إرسال التقييم':'Submit rating');
