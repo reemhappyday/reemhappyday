@@ -187,35 +187,39 @@ function saveFeedbackLocally(payload) {
 }
 
 async function sendFeedback(payload) {
-  const body = new URLSearchParams({
-    'form-name': 'guestbook',
-    dateTime: payload.createdAt,
-    rating: String(payload.rating),
-    door: String(payload.door || 0),
-    comment: String(payload.comment || '')
-  });
-
   try {
-    const response = await fetch('/', {
+    // Submit using the exact static form Netlify detects during deployment.
+    const form = document.querySelector('form[name="guestbook"][data-netlify="true"]');
+    if (!form) {
+      throw new Error('Netlify guestbook form is missing from this page.');
+    }
+
+    form.querySelector('[name="dateTime"]').value = payload.createdAt;
+    form.querySelector('[name="rating"]').value = String(payload.rating);
+    form.querySelector('[name="door"]').value = String(payload.door || 0);
+    form.querySelector('[name="comment"]').value = String(payload.comment || '');
+
+    const body = new URLSearchParams(new FormData(form));
+    const response = await fetch(form.getAttribute('action') || window.location.pathname, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
+      credentials: 'same-origin',
       body: body.toString()
     });
 
     if (!response.ok) {
-      throw new Error('Submission failed');
+      throw new Error('Netlify rejected the guestbook submission: HTTP ' + response.status);
     }
 
     return {
       ok: true,
       message: 'شكرا لك، تم إرسال تقييمك بنجاح.'
     };
-
   } catch (error) {
+    console.error('Reem guestbook submission failed:', error);
     saveFeedbackLocally(payload);
-
     return {
       ok: false,
       message: 'تعذر إرسال التقييم. يرجى المحاولة مرة أخرى.'
