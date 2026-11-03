@@ -223,51 +223,6 @@ async function sendFeedback(payload) {
   }
 }
 
-  const body = new URLSearchParams({
-    rating: String(payload.rating),
-    comment: String(payload.comment || ''),
-    door: String(payload.door || 0),
-    language: SITE_LANG,
-    createdAt: payload.createdAt
-  });
-
-  try {
-    const response = await fetch(FEEDBACK_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-      body: body.toString(),
-      credentials: 'omit'
-    });
-
-    if (!response.ok) {
-      const saved = saveFeedbackLocally(payload);
-      return {
-        ok: saved,
-        mode: 'fallback-local',
-        message: SITE_LANG === 'ar'
-          ? 'تعذر إرسال التقييم إلى الخادم، لذلك تم حفظه محليًا.'
-          : 'The submission could not reach the remote endpoint, so it was saved locally.'
-      };
-    }
-
-    return {
-      ok: true,
-      mode: 'remote',
-      message: SITE_LANG === 'ar'
-        ? 'شكرا لك، تم إرسال تقييمك بنجاح.'
-        : 'Thank you, your rating was sent successfully.'
-    };
-  } catch (error) {
-    const saved = saveFeedbackLocally(payload);
-    return {
-      ok: saved,
-      mode: 'fallback-local',
-      message: SITE_LANG === 'ar'
-        ? 'تعذر إرسال التقييم إلى الخادم، لذلك تم حفظه محليًا.'
-        : 'The submission could not reach the remote endpoint, so it was saved locally.'
-    };
-  }
-}
 
 $('submitComment').addEventListener('click',async()=>{
   const commentValue = ($('comment').value || '').trim();
@@ -462,39 +417,7 @@ window.addEventListener('DOMContentLoaded',updateRemaining);
   document.addEventListener('selectstart',e=>{if(isEditable(e.target))return;e.preventDefault();showNotice('copy');},true);
   document.addEventListener('copy',e=>{if(isEditable(e.target))return;e.preventDefault();e.stopImmediatePropagation();showNotice('copy');},true);
   document.addEventListener('cut',e=>{if(isEditable(e.target))return;e.preventDefault();e.stopImmediatePropagation();showNotice('copy');},true);
-  document.addEventListener('click',e=>{
-    const if $('copyMessageBtn').addEventListener('click', async () => {
-  const text = $('messageText').textContent +
-    '\n\nhttps://reem-happy-day.netlify.app/';
 
-  try {
-    if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(text);
-    } else {
-      const temp = document.createElement('textarea');
-      temp.value = text;
-      temp.style.position = 'fixed';
-      temp.style.opacity = '0';
-      document.body.appendChild(temp);
-      temp.focus();
-      temp.select();
-
-      const copied = document.execCommand('copy');
-      temp.remove();
-
-      if (!copied) throw new Error('Copy failed');
-    }
-
-    $('shareStatus').textContent =
-      'تم نسخ الرسالة ورابط قصر الرسائل.';
-
-  } catch (error) {
-    $('shareStatus').textContent =
-      'تعذر النسخ تلقائيا. يرجى المحاولة مرة أخرى.';
-  }
-});
-}
-  },true);
   document.addEventListener('keydown',e=>{
     if(isEditable(e.target))return;
     const key=String(e.key||'').toLowerCase();
