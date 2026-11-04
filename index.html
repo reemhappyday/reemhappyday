@@ -171,27 +171,11 @@ $('commentBtn').addEventListener('click',()=>{ $('commentBox').style.display='bl
 document.querySelectorAll('#rating button').forEach(btn=>btn.addEventListener('click',()=>{selectedRating=Number(btn.dataset.rate);document.querySelectorAll('#rating button').forEach(b=>b.classList.toggle('selected',Number(b.dataset.rate)===selectedRating));}));
 $('comment').addEventListener('input',()=>{$('commentCounter').textContent=$('comment').value.length+(SITE_LANG==='ar'?' / 50 حرفا':' / 50 characters');});
 
-const FEEDBACK_ENDPOINT = (window.__REEM_FEEDBACK_ENDPOINT__ || '').trim();
-const FEEDBACK_KEY = 'alreemFeedback_v1';
-
-function saveFeedbackLocally(payload) {
-  try {
-    const existing = JSON.parse(localStorage.getItem(FEEDBACK_KEY) || '[]');
-    const list = Array.isArray(existing) ? existing : [];
-    list.push({ ...payload, savedAt: new Date().toISOString() });
-    localStorage.setItem(FEEDBACK_KEY, JSON.stringify(list));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
 async function sendFeedback(payload) {
   try {
     const response = await fetch('/api/ratings', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
 
@@ -207,21 +191,16 @@ async function sendFeedback(payload) {
         ? 'شكرا لك، تم إرسال تقييمك بنجاح.'
         : 'Thank you, your rating was sent successfully.'
     };
-
   } catch (error) {
     console.error('Reem rating submission failed:', error);
-
-    saveFeedbackLocally(payload);
-
     return {
       ok: false,
       message: SITE_LANG === 'ar'
-        ? 'تعذر إرسال التقييم إلى الموقع. حُفظت نسخة في هذا المتصفح فقط.'
-        : 'The rating could not be sent. A copy was saved in this browser only.'
+        ? 'تعذر إرسال التقييم. لم يتم حفظه؛ يرجى المحاولة مرة أخرى.'
+        : 'The rating could not be sent and was not saved. Please try again.'
     };
   }
 }
-
 
 $('submitComment').addEventListener('click',async()=>{
   const commentValue = ($('comment').value || '').trim();
