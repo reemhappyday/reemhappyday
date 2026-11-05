@@ -95,6 +95,7 @@
       }
       const templateParams = {
         to_email: "reemhappyday@gmail.com",
+        email: "reemhappyday@gmail.com", // EmailJS template currently expects the variable "email".
         rating: payload.rating,
         comment: payload.comment || "لم يترك الزائر تعليقاً.",
         door: payload.door,
