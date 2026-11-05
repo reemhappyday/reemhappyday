@@ -1,24 +1,16 @@
-# قصر الرسائل | الريم
+## Hi there 👋
 
-موقع عربي تفاعلي للتأمل والرسائل الإيجابية، يتضمن ستة أبواب ورسائل يومية ومشاركة وتقييم الزوار.
+<!--
+**reemhappyday/reemhappyday** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
-## الملفات الأساسية
-- `index.html`: واجهة الموقع ومنطق الأبواب والرسائل.
-- `style.css`: التصميم المتجاوب.
-- `ratings.js`: اختيار النجوم والتحقق من التعليق وإرسال التقييم.
-- `netlify/functions/ratings.js`: خدمة Netlify التي ترسل التقييم إلى EmailJS.
-- `functions/api/ratings.js`: نسخة Cloudflare Pages Function عند استخدام Cloudflare Pages.
-- `assets/`: صور الخلفية والأبواب.
+Here are some ideas to get you started:
 
-## إعداد التقييم عبر EmailJS
-تستخدم خدمة التقييم المعرفات العامة التي تم إعدادها للمشروع. لا تضع أي مفتاح سري أو Access Token في ملفات الواجهة.
-يجب أن يحتوي قالب EmailJS `template_zgb2478` على متغيرات مثل:
-`{{rating}}`, `{{comment}}`, `{{door}}`, `{{door_name}}`, `{{created_at}}`, `{{language}}`, `{{to_email}}`, `{{site_name}}`.
-اضبط خانة المستلم في قالب EmailJS على `{{to_email}}` أو ثبّت بريد الاستلام في إعدادات القالب.
-
-## النشر على Netlify
-المجلد المنشور هو جذر المشروع. ملف `netlify.toml` يربط `/api/ratings` بوظيفة Netlify.
-بعد رفع التغييرات، انتظر اكتمال Deploy ثم اختبر إرسال تقييم تجريبي وافحص سجل الوظيفة في Netlify.
-
-## ملاحظة
-ملفات الصور ونسخة ZIP المؤرشفة محفوظة كما هي؛ التعديلات البرمجية لا تستبدل الأصول المرئية.
+- 🔭 I’m currently working on ...
+- 🌱 I’m currently learning ...
+- 👯 I’m looking to collaborate on ...
+- 🤔 I’m looking for help with ...
+- 💬 Ask me about ...
+- 📫 How to reach me: ...
+- 😄 Pronouns: ...
+- ⚡ Fun fact: ...
+-->

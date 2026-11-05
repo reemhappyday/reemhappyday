@@ -5,10 +5,10 @@ const FEEDBACK_EMAIL = "reemhappyday@gmail.com";
 
 function normalizeText(value) {
   return String(value || "").toLowerCase().normalize("NFKC")
-    .replace(/[\\u064B-\\u065F\\u0670\\u0640]/g, "")
+    .replace(/[\u064B-\u065F\u0670\u0640]/g, "")
     .replace(/[أإآٱ]/g, "ا").replace(/ى/g, "ي").replace(/ؤ/g, "و").replace(/ئ/g, "ي")
     .replace(/[٠-٩]/g, d => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
-    .replace(/[\\s\\u200b-\\u200f.,،؛;:!؟?*~_+=()\\[\\]{}<>/\\\\|\\-]+/g, "");
+    .replace(/[\s\u200b-\u200f.,،؛;:!؟?*~_+=()\\[\\]{}<>/\\|\\-]+/g, "");
 }
 
 const BANNED_WORDS = [
@@ -89,30 +89,19 @@ async function sendRating(request, env = {}) {
   }
 }
 
-export async function onRequestPost({ request, env }) {
-  const result = await sendRating(request, env || {});
-  return new Response(JSON.stringify(result.body), {
-    status: result.status,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store",
-      "Access-Control-Allow-Origin": new URL(request.url).origin
-    }
-  });
-}
-
-export async function onRequest({ request }) {
-  if (request.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: { "Allow": "POST, OPTIONS" }
-    });
-  }
+export async function onRequest({ request, env }) {
   if (request.method !== "POST") {
     return new Response(JSON.stringify({ ok: false, error: "Method not allowed." }), {
       status: 405,
       headers: { "Content-Type": "application/json; charset=utf-8", "Allow": "POST" }
     });
   }
-  return onRequestPost({ request, env: {} });
+  const result = await sendRating(request, env || {});
+  return new Response(JSON.stringify(result.body), {
+    status: result.status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store"
+    }
+  });
 }

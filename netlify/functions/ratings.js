@@ -5,10 +5,10 @@ const FEEDBACK_EMAIL = "reemhappyday@gmail.com";
 
 function normalizeText(value) {
   return String(value || "").toLowerCase().normalize("NFKC")
-    .replace(/[\\u064B-\\u065F\\u0670\\u0640]/g, "")
+    .replace(/[\u064B-\u065F\u0670\u0640]/g, "")
     .replace(/[أإآٱ]/g, "ا").replace(/ى/g, "ي").replace(/ؤ/g, "و").replace(/ئ/g, "ي")
     .replace(/[٠-٩]/g, d => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
-    .replace(/[\\s\\u200b-\\u200f.,،؛;:!؟?*~_+=()\\[\\]{}<>/\\\\|\\-]+/g, "");
+    .replace(/[\s\u200b-\u200f.,،؛;:!؟?*~_+=()\\[\\]{}<>/\\|\\-]+/g, "");
 }
 
 const BANNED_WORDS = [

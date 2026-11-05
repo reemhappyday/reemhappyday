@@ -16,7 +16,7 @@
     return;
   }
 
-  let selectedRating = 0;
+  context.selectedRating = 0;
   const language = () => document.documentElement.lang === "en" ? "en" : "ar";
   const message = (ar, en) => language() === "ar" ? ar : en;
 
@@ -29,10 +29,10 @@
 
   function normalize(value) {
     return String(value || "").toLowerCase().normalize("NFKC")
-      .replace(/[\\u064B-\\u065F\\u0670\\u0640]/g, "")
+      .replace(/[\u064B-\u065F\u0670\u0640]/g, "")
       .replace(/[أإآٱ]/g, "ا").replace(/ى/g, "ي").replace(/ؤ/g, "و").replace(/ئ/g, "ي")
       .replace(/[٠-٩]/g, d => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
-      .replace(/[\\s\\u200b-\\u200f.,،؛;:!؟?*~_+=()\\[\\]{}<>/\\\\|\\-]+/g, "");
+      .replace(/[\s\u200b-\u200f.,،؛;:!؟?*~_+=()\\[\\]{}<>/\\|\\-]+/g, "");
   }
 
   const blocked = ["كس","كسمك","كسخت","طيز","زب","زبي","شرموط","شرموطة","متناك","منيوك","منيك",
@@ -46,10 +46,9 @@
 
   buttons.forEach(button => {
     button.addEventListener("click", () => {
-      selectedRating = Number(button.dataset.rate);
-      context.selectedRating = selectedRating;
+      context.selectedRating = Number(button.dataset.rate);
       buttons.forEach(item => {
-        const active = Number(item.dataset.rate) === selectedRating;
+        const active = Number(item.dataset.rate) === Number(context.selectedRating);
         item.classList.toggle("selected", active);
         item.setAttribute("aria-pressed", String(active));
       });
@@ -62,7 +61,7 @@
 
   submit.addEventListener("click", async () => {
     const value = comment.value.trim();
-    if (!selectedRating) {
+    if (!Number(context.selectedRating)) {
       status.textContent = message("يرجى اختيار تقييم من 1 إلى 5 أولا.", "Please choose a rating from 1 to 5 first.");
       return;
     }
@@ -81,7 +80,7 @@
     }
 
     const payload = {
-      rating: selectedRating,
+      rating: Number(context.selectedRating),
       comment: value,
       door: Number(context.chosenDoor),
       createdAt: new Date().toISOString(),
@@ -106,7 +105,6 @@
 
       status.textContent = message("شكرا لك، وصل تقييمك بنجاح.", "Thank you. Your rating was sent successfully.");
       comment.value = "";
-      selectedRating = 0;
       context.selectedRating = 0;
       buttons.forEach(button => {
         button.classList.remove("selected");
