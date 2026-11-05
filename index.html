@@ -33,7 +33,7 @@
 :root{--gold:#d9b56d;--gold-light:#f3dfaa;--ink:#f8f5ee;--cream:#f7f0e2;--muted:#e8dcc5;--green:#063d32;--burgundy:#4c1426}
 *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:#f8f5ee;color:var(--cream);font-family:Tahoma,Arial,sans-serif;min-height:100vh}
 button,textarea{font:inherit}button{cursor:pointer}
-.hero{position:relative;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:30px 18px;background:linear-gradient(90deg,rgba(255,252,245,.18),rgba(255,252,245,.02)),url("./assets/fancy-pattern.png") center/cover no-repeat}
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:30px 18px;background:linear-gradient(90deg,rgba(255,252,245,.18),rgba(255,252,245,.02)),url("./assets/palace-welcome-background.jpg") center/cover no-repeat}
 .hero:before{content:"";position:absolute;inset:14px;border:1px solid rgba(217,181,109,.62);pointer-events:none}
 .hero:after{content:"✧    ✧";position:absolute;top:22px;left:50%;transform:translateX(-50%);color:var(--gold);font-size:24px;letter-spacing:12px;text-shadow:0 0 18px #e7bd69}
 .design-note{margin:22px 0 0;color:rgba(247,240,226,.62);font-size:12px;line-height:1.6}.panel{position:relative;width:min(620px,100%);padding:clamp(26px,5vw,52px);text-align:center;background:linear-gradient(180deg,rgba(20,17,13,.82),rgba(15,13,11,.9));border:1px solid rgba(217,181,109,.78);box-shadow:0 24px 60px rgba(0,0,0,.3)}
@@ -54,8 +54,8 @@ button,textarea{font:inherit}button{cursor:pointer}
 #commentCounter{margin-top:6px;text-align:left;direction:ltr;color:#d7c49f}.status{white-space:pre-wrap}
 
 </style>
+<link rel="stylesheet" href="./style.css">
 </head>
-  <link rel="stylesheet" href="style.css">
 <body>
 <section id="welcome" class="hero">
   <div class="panel"><div class="kicker">مساحة للتأمل، وأبواب للأمل</div><div class="brand">الريم</div><div class="ornament">✧ ──  ── ✧</div><p class="intro"><strong class="challenge">لا تعرف ما ينتظرك خلف الباب... حتى تجرؤ على فتحه.</strong><br><br>مرحبا بك في قصر الرسائل...<br>ممر من الألوان، وملصق من الكلمات، ونافذة صغيرة ترسم لك طريقك.</p><div class="actions"><button id="startBtn" class="action-btn">ابدأ الرحلة</button></div><div class="design-note">تصميم مستوحى من الزخارف الهندسية والأحجار الكريمة</div></div>
@@ -146,6 +146,7 @@ function dayOfYear(){const n=new Date();return Math.floor((new Date(n.getFullYea
 function dailyClicks(d){const k=localDayKey();return dailyState.date===k?Math.max(0,Number(dailyState[d]||0)):0;}
 function saveDailyClick(d){const k=localDayKey();if(dailyState.date!==k)dailyState={date:k};dailyState[d]=dailyClicks(d)+1;localStorage.setItem(DAILY_KEY,JSON.stringify(dailyState));}
 let selectedRating=0; let chosenDoor=0; let busy=false;
+window.__REEM_GAME_CONTEXT={get selectedRating(){return selectedRating;},set selectedRating(value){selectedRating=value;},get chosenDoor(){return chosenDoor;}};
 const $=id=>document.getElementById(id);
 function getDoorCount(d){return Math.max(0,Number(doorCounts[d]||0)||0);}
 function saveDoorCounts(){localStorage.setItem(COUNT_KEY,JSON.stringify(doorCounts));updateRemaining();}
@@ -168,74 +169,7 @@ document.querySelectorAll('.door').forEach(btn=>btn.addEventListener('click',()=
 }));
 $('exitBtn').addEventListener('click',()=>{ $('messageBox').hidden=true; resetVisuals(); $('doors').style.display='grid';});
 $('commentBtn').addEventListener('click',()=>{ $('commentBox').style.display='block'; $('commentBox').scrollIntoView({behavior:'smooth',block:'center'}); });
-document.querySelectorAll('#rating button').forEach(btn=>btn.addEventListener('click',()=>{selectedRating=Number(btn.dataset.rate);document.querySelectorAll('#rating button').forEach(b=>b.classList.toggle('selected',Number(b.dataset.rate)===selectedRating));}));
-$('comment').addEventListener('input',()=>{$('commentCounter').textContent=$('comment').value.length+(SITE_LANG==='ar'?' / 50 حرفا':' / 50 characters');});
-
-async function sendFeedback(payload) {
-  try {
-    const response = await fetch('/api/ratings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-
-    if (!response.ok || !result.ok) {
-      throw new Error(result.error || 'Rating submission failed');
-    }
-
-    return {
-      ok: true,
-      message: SITE_LANG === 'ar'
-        ? 'شكرا لك، تم إرسال تقييمك بنجاح.'
-        : 'Thank you, your rating was sent successfully.'
-    };
-  } catch (error) {
-    console.error('Reem rating submission failed:', error);
-    return {
-      ok: false,
-      message: SITE_LANG === 'ar'
-        ? 'تعذر إرسال التقييم. لم يتم حفظه؛ يرجى المحاولة مرة أخرى.'
-        : 'The rating could not be sent and was not saved. Please try again.'
-    };
-  }
-}
-
-$('submitComment').addEventListener('click',async()=>{
-  const commentValue = ($('comment').value || '').trim();
-  if(!selectedRating){
-    $('commentStatus').textContent = SITE_LANG==='ar' ? 'يرجى اختيار تقييم من 1 إلى 5 أولا.' : 'Please choose a rating from 1 to 5 first.';
-    return;
-  }
-  if(commentValue.length > 50){
-    $('commentStatus').textContent = SITE_LANG==='ar' ? 'الحد الأقصى للتعليق 50 حرفا.' : 'Comments are limited to 50 characters.';
-    return;
-  }
-
-  const payload = {
-    rating: Number(selectedRating),
-    comment: commentValue,
-    door: Number(chosenDoor || 0),
-    createdAt: new Date().toISOString(),
-    language: SITE_LANG
-  };
-
-  $('commentStatus').textContent = SITE_LANG === 'ar' ? 'جاري إرسال التقييم...' : 'Submitting your rating...';
-
-  const result = await sendFeedback(payload);
-  $('commentStatus').textContent = result.message;
-
-  if (result.ok) {
-    $('comment').value = '';
-    selectedRating = 0;
-    document.querySelectorAll('#rating button').forEach(b => b.classList.remove('selected'));
-    setTimeout(() => {
-      $('commentBox').style.display = 'none';
-      $('commentStatus').textContent = '';
-    }, 1800);
-  }
-});
+// Rating controls and submission are handled by the standalone ratings.js file.
 
 function leave(){ $('game').classList.remove('active'); $('welcome').style.display='flex'; $('startBtn').textContent='متابعة الرحلة'; busy=false; updateRemaining(); }
 
@@ -435,5 +369,6 @@ window.addEventListener('DOMContentLoaded',updateRemaining);
   }
 })();</script>
 
+<script src="./ratings.js" defer></script>
 </body>
 </html>
