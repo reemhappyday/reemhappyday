@@ -90,20 +90,35 @@
     submit.disabled = true;
     status.textContent = message("جارٍ إرسال تقييمك إلى البريد الإلكتروني...", "Sending your rating by email...");
     try {
-      const response = await fetch("/api/ratings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify(payload),
-        credentials: "same-origin"
-      });
-      let result;
-      try { result = await response.json(); }
-      catch (_) { throw new Error("The server returned an invalid response."); }
-      if (!response.ok || !result || result.ok !== true) {
-        throw new Error((result && result.error) || "Rating submission failed.");
+      if (!window.emailjs || typeof window.emailjs.send !== "function") {
+        throw new Error("EmailJS browser SDK did not load.");
+      }
+      const templateParams = {
+        to_email: "reemhappyday@gmail.com",
+        rating: payload.rating,
+        comment: payload.comment || "لم يترك الزائر تعليقاً.",
+        door: payload.door,
+        door_name: ["", "الفيروز", "الياقوت الوردي", "الذهب", "الزمرد", "الجمشت", "اللؤلؤ"][payload.door],
+        created_at: payload.createdAt,
+        createdAt: payload.createdAt,
+        date: payload.createdAt,
+        language: payload.language,
+        site_name: "قصر الرسائل — الريم",
+        subject: "تقييم جديد لقصر الرسائل",
+        message: "تقييم جديد لقصر الرسائل",
+        rating_text: payload.rating + " / 5"
+      };
+      const result = await window.emailjs.send(
+        "service_2klbddg",
+        "template_zgb2478",
+        templateParams,
+        { publicKey: "vRtu99xC8ZQoYMloJ" }
+      );
+      if (!result || Number(result.status) < 200 || Number(result.status) >= 300) {
+        throw new Error("EmailJS did not confirm the email request.");
       }
 
-      status.textContent = message("شكرا لك، وصل تقييمك بنجاح.", "Thank you. Your rating was sent successfully.");
+      status.textContent = message("شكرا لك، قبلت خدمة البريد إرسال تقييمك بنجاح.", "Thank you. The email service accepted your rating.");
       comment.value = "";
       context.selectedRating = 0;
       buttons.forEach(button => {
@@ -114,8 +129,8 @@
     } catch (error) {
       console.error("Rating submission error:", error);
       status.textContent = message(
-        "تعذر إرسال التقييم. لم يتم تأكيد وصوله؛ يرجى المحاولة مرة أخرى.",
-        "The rating was not confirmed as delivered. Please try again."
+        "تعذر إرسال التقييم بالبريد. تأكدي من إعداد قالب EmailJS ثم حاولي مرة أخرى.",
+        "The email could not be sent. Check the EmailJS template settings and try again."
       );
     } finally {
       submit.disabled = false;
